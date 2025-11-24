@@ -1,0 +1,5 @@
+tensorflow>=2.10.0
+numpy>=1.21
+matplotlib>=3.4
+tqdm>=4.64
+Pillow>=9.0

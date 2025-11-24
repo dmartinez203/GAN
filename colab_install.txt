@@ -1,0 +1,8 @@
+# Upgrade pip (recommended)
+pip install --upgrade pip
+
+# Install all required packages from the requirements file
+pip install -r colab_requirements.txt
+
+# Alternative single-line install (paste into a Colab cell):
+# pip install --upgrade pip && pip install "tensorflow>=2.10.0" numpy matplotlib tqdm Pillow
