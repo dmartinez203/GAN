@@ -1,0 +1,204 @@
+nohup: ignoring input
+2025-11-24 05:10:11.078740: E external/local_xla/xla/stream_executor/cuda/cuda_fft.cc:467] Unable to register cuFFT factory: Attempting to register factory for plugin cuFFT when one has already been registered
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+E0000 00:00:1763961011.086197 1053958 cuda_dnn.cc:8579] Unable to register cuDNN factory: Attempting to register factory for plugin cuDNN when one has already been registered
+E0000 00:00:1763961011.089749 1053958 cuda_blas.cc:1407] Unable to register cuBLAS factory: Attempting to register factory for plugin cuBLAS when one has already been registered
+W0000 00:00:1763961011.094254 1053958 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1763961011.094282 1053958 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1763961011.094287 1053958 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+W0000 00:00:1763961011.094290 1053958 computation_placer.cc:177] computation placer already registered. Please check linkage and avoid linking the same target more than once.
+I0000 00:00:1763961013.158451 1053958 gpu_device.cc:2019] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 94411 MB memory:  -> device: 0, name: NVIDIA GH200 480GB, pci bus id: 0000:dd:00.0, compute capability: 9.0
+/usr/lib/python3/dist-packages/keras/src/layers/activations/leaky_relu.py:41: UserWarning: Argument `alpha` is deprecated. Use `negative_slope` instead.
+  warnings.warn(
+TensorFlow version: 2.19.0
+Keras version: 3.10.0
+NumPy version: 1.26.4
+============================================================
+GENERATOR ARCHITECTURE
+============================================================
+Model: "Generator"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ dense (Dense)                   │ (None, 256)            │        25,856 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ leaky_re_lu (LeakyReLU)         │ (None, 256)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization             │ (None, 256)            │         1,024 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_1 (Dense)                 │ (None, 512)            │       131,584 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ leaky_re_lu_1 (LeakyReLU)       │ (None, 512)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_1           │ (None, 512)            │         2,048 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_2 (Dense)                 │ (None, 1024)           │       525,312 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ leaky_re_lu_2 (LeakyReLU)       │ (None, 1024)           │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ batch_normalization_2           │ (None, 1024)           │         4,096 │
+│ (BatchNormalization)            │                        │               │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_3 (Dense)                 │ (None, 784)            │       803,600 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ reshape (Reshape)               │ (None, 28, 28, 1)      │             0 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 1,493,520 (5.70 MB)
+ Trainable params: 1,489,936 (5.68 MB)
+ Non-trainable params: 3,584 (14.00 KB)
+
+============================================================
+DISCRIMINATOR ARCHITECTURE
+============================================================
+Model: "Discriminator"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ flatten (Flatten)               │ (None, 784)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_4 (Dense)                 │ (None, 1024)           │       803,840 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ leaky_re_lu_3 (LeakyReLU)       │ (None, 1024)           │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout (Dropout)               │ (None, 1024)           │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_5 (Dense)                 │ (None, 512)            │       524,800 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ leaky_re_lu_4 (LeakyReLU)       │ (None, 512)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout_1 (Dropout)             │ (None, 512)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_6 (Dense)                 │ (None, 256)            │       131,328 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ leaky_re_lu_5 (LeakyReLU)       │ (None, 256)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dropout_2 (Dropout)             │ (None, 256)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ dense_7 (Dense)                 │ (None, 1)              │           257 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 1,460,225 (5.57 MB)
+ Trainable params: 1,460,225 (5.57 MB)
+ Non-trainable params: 0 (0.00 B)
+Model: "GAN"
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┓
+┃ Layer (type)                    ┃ Output Shape           ┃       Param # ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━┩
+│ input_layer_2 (InputLayer)      │ (None, 100)            │             0 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ Generator (Sequential)          │ (None, 28, 28, 1)      │     1,493,520 │
+├─────────────────────────────────┼────────────────────────┼───────────────┤
+│ Discriminator (Sequential)      │ (None, 1)              │     1,460,225 │
+└─────────────────────────────────┴────────────────────────┴───────────────┘
+ Total params: 2,953,745 (11.27 MB)
+ Trainable params: 1,489,936 (5.68 MB)
+ Non-trainable params: 1,463,809 (5.58 MB)
+WARNING: All log messages before absl::InitializeLog() is called are written to STDERR
+I0000 00:00:1763961020.910905 1054094 service.cc:152] XLA service 0xfab2b4004400 initialized for platform CUDA (this does not guarantee that XLA will be used). Devices:
+I0000 00:00:1763961020.910941 1054094 service.cc:160]   StreamExecutor device (0): NVIDIA GH200 480GB, Compute Capability 9.0
+2025-11-24 05:10:20.915261: I tensorflow/compiler/mlir/tensorflow/utils/dump_mlir_util.cc:269] disabling MLIR crash reproducer, set env var `MLIR_CRASH_REPRODUCER_DIRECTORY` to enable.
+I0000 00:00:1763961020.946960 1054094 cuda_dnn.cc:529] Loaded cuDNN version 90800
+I0000 00:00:1763961021.038217 1054094 device_compiler.h:188] Compiled cluster using XLA!  This line is logged at most once for the lifetime of the process.
+[1m1/4[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 258ms/step[1m4/4[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 63ms/step [1m4/4[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 68ms/step
+/usr/lib/python3/dist-packages/keras/src/backend/tensorflow/trainer.py:83: UserWarning: The model does not have any trainable weights.
+  warnings.warn("The model does not have any trainable weights.")
+2025-11-24 05:10:25.201275: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1443', 28 bytes spill stores, 28 bytes spill loads
+
+2025-11-24 05:10:25.281748: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1443', 208 bytes spill stores, 208 bytes spill loads
+
+2025-11-24 05:10:25.291798: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1443', 76 bytes spill stores, 76 bytes spill loads
+
+2025-11-24 05:10:25.306087: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1443', 68 bytes spill stores, 68 bytes spill loads
+
+2025-11-24 05:10:25.312732: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1443', 36 bytes spill stores, 36 bytes spill loads
+
+2025-11-24 05:10:25.445959: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1443', 672 bytes spill stores, 672 bytes spill loads
+
+2025-11-24 05:10:25.459562: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1443', 568 bytes spill stores, 568 bytes spill loads
+
+2025-11-24 05:10:25.474113: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1443', 692 bytes spill stores, 692 bytes spill loads
+
+2025-11-24 05:10:25.539544: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1443_0', 1084 bytes spill stores, 1148 bytes spill loads
+
+2025-11-24 05:10:25.659186: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1443', 1328 bytes spill stores, 1440 bytes spill loads
+
+2025-11-24 05:10:25.728276: I external/local_xla/xla/stream_executor/cuda/subprocess_compilation.cc:346] ptxas warning : Registers are spilled to local memory in function 'gemm_fusion_dot_1443', 1016 bytes spill stores, 1032 bytes spill loads
+
+x_train shape: (60000, 28, 28, 1) min/max: -1.0 1.0
+Starting training for 400 epochs...
+Batch size: 128, Batches per epoch: 468
+Milestones for image saving: [1, 30, 100, 200, 400]
+============================================================
+Epoch 1/400 | D_loss=1.2931 | G_loss=0.4605 | D_acc=0.0000
+[1m1/4[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 15ms/step[1m4/4[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 5ms/step 
+Epoch 10/400 | D_loss=1.5812 | G_loss=0.3425 | D_acc=0.0000
+Epoch 20/400 | D_loss=1.5802 | G_loss=0.3362 | D_acc=0.0000
+Epoch 30/400 | D_loss=1.5791 | G_loss=0.3339 | D_acc=0.0000
+[1m1/4[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 15ms/step[1m4/4[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 5ms/step 
+Epoch 40/400 | D_loss=1.5782 | G_loss=0.3326 | D_acc=0.0000
+Epoch 50/400 | D_loss=1.5774 | G_loss=0.3318 | D_acc=0.0000
+Epoch 60/400 | D_loss=1.5769 | G_loss=0.3313 | D_acc=0.0000
+Epoch 70/400 | D_loss=1.5767 | G_loss=0.3309 | D_acc=0.0000
+Epoch 80/400 | D_loss=1.5764 | G_loss=0.3306 | D_acc=0.0000
+Epoch 90/400 | D_loss=1.5762 | G_loss=0.3303 | D_acc=0.0000
+Epoch 100/400 | D_loss=1.5761 | G_loss=0.3301 | D_acc=0.0000
+[1m1/4[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 17ms/step[1m4/4[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 6ms/step 
+Epoch 110/400 | D_loss=1.5759 | G_loss=0.3300 | D_acc=0.0000
+Epoch 120/400 | D_loss=1.5758 | G_loss=0.3298 | D_acc=0.0000
+Epoch 130/400 | D_loss=1.5757 | G_loss=0.3297 | D_acc=0.0000
+Epoch 140/400 | D_loss=1.5757 | G_loss=0.3296 | D_acc=0.0000
+Epoch 150/400 | D_loss=1.5755 | G_loss=0.3295 | D_acc=0.0000
+Epoch 160/400 | D_loss=1.5754 | G_loss=0.3294 | D_acc=0.0000
+Epoch 170/400 | D_loss=1.5753 | G_loss=0.3293 | D_acc=0.0000
+Epoch 180/400 | D_loss=1.5752 | G_loss=0.3293 | D_acc=0.0000
+Epoch 190/400 | D_loss=1.5752 | G_loss=0.3292 | D_acc=0.0000
+Epoch 200/400 | D_loss=1.5751 | G_loss=0.3292 | D_acc=0.0000
+[1m1/4[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 18ms/step[1m4/4[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 6ms/step 
+Epoch 210/400 | D_loss=1.5751 | G_loss=0.3291 | D_acc=0.0000
+Epoch 220/400 | D_loss=1.5751 | G_loss=0.3291 | D_acc=0.0000
+Epoch 230/400 | D_loss=1.5750 | G_loss=0.3290 | D_acc=0.0000
+Epoch 240/400 | D_loss=1.5750 | G_loss=0.3290 | D_acc=0.0000
+Epoch 250/400 | D_loss=1.5749 | G_loss=0.3290 | D_acc=0.0000
+Epoch 260/400 | D_loss=1.5749 | G_loss=0.3289 | D_acc=0.0000
+Epoch 270/400 | D_loss=1.5748 | G_loss=0.3289 | D_acc=0.0000
+Epoch 280/400 | D_loss=1.5748 | G_loss=0.3289 | D_acc=0.0000
+Epoch 290/400 | D_loss=1.5748 | G_loss=0.3288 | D_acc=0.0000
+Epoch 300/400 | D_loss=1.5748 | G_loss=0.3288 | D_acc=0.0000
+Epoch 310/400 | D_loss=1.5747 | G_loss=0.3288 | D_acc=0.0000
+Epoch 320/400 | D_loss=1.5747 | G_loss=0.3288 | D_acc=0.0000
+Epoch 330/400 | D_loss=1.5746 | G_loss=0.3288 | D_acc=0.0000
+Epoch 340/400 | D_loss=1.5746 | G_loss=0.3287 | D_acc=0.0000
+Epoch 350/400 | D_loss=1.5746 | G_loss=0.3287 | D_acc=0.0000
+Epoch 360/400 | D_loss=1.5746 | G_loss=0.3287 | D_acc=0.0000
+Epoch 370/400 | D_loss=1.5745 | G_loss=0.3287 | D_acc=0.0000
+Epoch 380/400 | D_loss=1.5745 | G_loss=0.3287 | D_acc=0.0000
+Epoch 390/400 | D_loss=1.5745 | G_loss=0.3287 | D_acc=0.0000
+Epoch 400/400 | D_loss=1.5744 | G_loss=0.3286 | D_acc=0.0000
+[1m1/4[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 16ms/step[1m4/4[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 5ms/step 
+============================================================
+Training completed!
+
+Models saved to gan_outputs/
+  - generator.keras
+  - discriminator.keras
+Generator found in memory — sampling 100 images...
+[1m1/4[0m [32m━━━━━[0m[37m━━━━━━━━━━━━━━━[0m [1m0s[0m 20ms/step[1m4/4[0m [32m━━━━━━━━━━━━━━━━━━━━[0m[37m[0m [1m0s[0m 7ms/step 
+
+============================================================
+SAVED MODELS
+============================================================
+Generator model: gan_outputs/generator.keras
+Discriminator model: gan_outputs/discriminator.keras
+
+To reload: generator = keras.models.load_model("gan_outputs/generator.keras")
+
+============================================================
+TRAINING METRICS SUMMARY
+============================================================
+Final Discriminator Loss: 1.5744
+Final Generator Loss: 0.3286
+Final Discriminator Accuracy: 0.0000
+Final D Loss (Real): 1.5744
+Final D Loss (Fake): 1.5744
+============================================================
