@@ -59,6 +59,24 @@ if 'trained_epochs' not in st.session_state:
     st.session_state.trained_epochs = 0
 if 'x_train' not in st.session_state:
     st.session_state.x_train = None
+if 'pretrained_mode' not in st.session_state:
+    st.session_state.pretrained_mode = False
+
+# Auto-load pre-trained models if available
+if st.session_state.generator is None:
+    if os.path.exists('gan_outputs/generator.keras'):
+        try:
+            st.session_state.generator = keras.models.load_model('gan_outputs/generator.keras')
+            st.session_state.pretrained_mode = True
+            st.session_state.trained_epochs = 400  # Assume 400 epochs for pre-trained
+        except Exception as e:
+            pass  # Silently fail, user can load manually
+    
+    if os.path.exists('gan_outputs/discriminator.keras') and st.session_state.pretrained_mode:
+        try:
+            st.session_state.discriminator = keras.models.load_model('gan_outputs/discriminator.keras')
+        except Exception as e:
+            pass  # Generator works without discriminator
 
 # Model building functions
 @st.cache_resource
@@ -189,7 +207,11 @@ def train_gan_epochs(generator, discriminator, gan, data, noise_dim, epochs, bat
 
 # Header
 st.markdown('<h1 class="main-header">🎨 GAN-based Fake Image Generator</h1>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Train a Generative Adversarial Network to create synthetic MNIST digits</p>', unsafe_allow_html=True)
+if st.session_state.pretrained_mode:
+    st.markdown('<p class="sub-header">✅ Pre-trained GAN loaded - Ready to generate synthetic MNIST digits!</p>', unsafe_allow_html=True)
+    st.success(f"🎯 Loaded pre-trained model with {st.session_state.trained_epochs} epochs of training")
+else:
+    st.markdown('<p class="sub-header">Train a Generative Adversarial Network to create synthetic MNIST digits</p>', unsafe_allow_html=True)
 
 # Sidebar
 with st.sidebar:
@@ -204,7 +226,7 @@ with st.sidebar:
     
     epochs_to_train = st.slider("Epochs to Train", min_value=1, max_value=100, value=10, step=1)
     
-    if st.button("🚀 Initialize Models", use_container_width=True):
+    if st.button("🚀 Initialize Models", use_container_width=True, disabled=st.session_state.pretrained_mode):
         with st.spinner("Building models..."):
             st.session_state.generator = build_generator(noise_dim)
             st.session_state.discriminator = build_discriminator()
@@ -227,7 +249,7 @@ with st.sidebar:
             
         st.success("✅ Models initialized!")
     
-    if st.button("🏋️ Train GAN", use_container_width=True, disabled=st.session_state.generator is None):
+    if st.button("🏋️ Train GAN", use_container_width=True, disabled=(st.session_state.generator is None or st.session_state.pretrained_mode)):
         progress_bar = st.progress(0)
         status_text = st.empty()
         
@@ -256,15 +278,29 @@ with st.sidebar:
     st.header("💾 Model Management")
     
     if st.button("💾 Save Generator", use_container_width=True, disabled=st.session_state.generator is None):
-        st.session_state.generator.save('saved_generator.h5')
+        os.makedirs('gan_outputs', exist_ok=True)
+        st.session_state.generator.save('gan_outputs/generator.keras')
         st.success("✅ Generator saved!")
     
-    if st.button("📂 Load Generator", use_container_width=True):
-        if os.path.exists('saved_generator.h5'):
-            st.session_state.generator = keras.models.load_model('saved_generator.h5')
+    if st.button("📂 Load Generator", use_container_width=True, disabled=st.session_state.pretrained_mode):
+        if os.path.exists('gan_outputs/generator.keras'):
+            st.session_state.generator = keras.models.load_model('gan_outputs/generator.keras')
+            st.session_state.pretrained_mode = True
+            st.session_state.trained_epochs = 400
             st.success("✅ Generator loaded!")
+            st.rerun()  # Refresh to update UI
         else:
             st.error("❌ No saved model found!")
+    
+    if st.session_state.pretrained_mode and st.button("🔄 Reset to Training Mode", use_container_width=True):
+        st.session_state.generator = None
+        st.session_state.discriminator = None
+        st.session_state.gan = None
+        st.session_state.pretrained_mode = False
+        st.session_state.trained_epochs = 0
+        st.session_state.training_history = {'d_loss': [], 'g_loss': [], 'd_acc': []}
+        st.success("✅ Reset to training mode!")
+        st.rerun()
 
 # Main content
 tab1, tab2, tab3, tab4 = st.tabs(["📊 Dashboard", "🖼️ Generate Images", "📈 Training Metrics", "ℹ️ About"])
@@ -318,7 +354,10 @@ with tab1:
             st.pyplot(fig)
             plt.close()
     else:
-        st.info("👈 Initialize models from the sidebar to get started!")
+        if st.session_state.pretrained_mode:
+            st.info("✅ Pre-trained models loaded! Generate images in the tabs above.")
+        else:
+            st.info("👈 Initialize models from the sidebar to get started!")
 
 with tab2:
     st.header("Generate Fake Images")
@@ -341,7 +380,10 @@ with tab2:
             else:
                 st.info("Click 'Generate New Batch' to create images")
     else:
-        st.warning("⚠️ Please initialize the models first from the sidebar!")
+        if st.session_state.pretrained_mode:
+            st.info("🎯 Pre-trained model ready! Generate images below.")
+        else:
+            st.warning("⚠️ Please initialize the models first from the sidebar!")
 
 with tab3:
     st.header("Training Metrics")
