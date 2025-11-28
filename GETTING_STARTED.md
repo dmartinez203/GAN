@@ -29,14 +29,10 @@ Your project includes:
 
 ### ✅ Documentation
 4. **`README.md`** - Complete project documentation
-5. **`DEPLOYMENT.md`** - Cloud deployment guide
-6. **`SUBMISSION_SUMMARY.md`** - Assignment requirements checklist
-7. **`SCREENSHOTS_GUIDE.md`** - How to document your work
 
 ### ✅ Configuration Files
-8. **`requirements.txt`** - Python dependencies
-9. **`colab_requirements.txt`** - Google Colab requirements
-10. **`quickstart.sh`** - Automated setup script
+5. **`requirements.txt`** - Python dependencies
+6. **`quickstart.sh`** - Automated setup script
 
 ---
 
