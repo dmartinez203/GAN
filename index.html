@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GAN Image Generator - Interactive Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 4px solid #667eea;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            gap: 20px;
+        }
+
+        .status-card {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+        }
+
+        .status-card h3 {
+            font-size: 0.9em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .status-card .value {
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        section {
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: #764ba2;
+            border-left: 5px solid #667eea;
+            padding-left: 15px;
+            margin-bottom: 20px;
+        }
+
+        .control-panel {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .control-group input[type="number"],
+        .control-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 15px 30px;
+            font-size: 1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f4ff;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f5f5f5;
+            border-radius: 10px;
+        }
+
+        .image-grid canvas {
+            width: 100%;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            background: white;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .log-container {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+        }
+
+        .chart-container {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 1em;
+            color: #666;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .status-bar {
+                flex-direction: column;
+            }
+            
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .image-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 GAN-based Fake Image Generator</h1>
+            <p class="subtitle">Interactive demonstration of Generative Adversarial Networks for MNIST digit synthesis</p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-card">
+                <h3>Training Epochs</h3>
+                <div class="value" id="epochCount">0</div>
+            </div>
+            <div class="status-card">
+                <h3>Generator Loss</h3>
+                <div class="value" id="genLoss">0.000</div>
+            </div>
+            <div class="status-card">
+                <h3>Discriminator Loss</h3>
+                <div class="value" id="discLoss">0.000</div>
+            </div>
+            <div class="status-card">
+                <h3>Model Status</h3>
+                <div class="value" id="modelStatus">Not Loaded</div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('overview')">📊 Overview</button>
+            <button class="tab" onclick="switchTab('generate')">🎨 Generate Images</button>
+            <button class="tab" onclick="switchTab('train')">🏋️ Training</button>
+            <button class="tab" onclick="switchTab('about')">ℹ️ About</button>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <section>
+                <h2>📋 Project Overview</h2>
+                <div class="info-box">
+                    <h3>Problem Statement</h3>
+                    <p>Fake images have become ubiquitous on social media, affecting public discourse. This project demonstrates how Generative Adversarial Networks (GANs) can create synthetic images that look like real ones, helping understand the technology behind fake image generation.</p>
+                </div>
+
+                <div class="control-panel">
+                    <h3>Quick Start</h3>
+                    <p><strong>Note:</strong> This is a demonstration interface. For full functionality including model training, please use one of the following:</p>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Streamlit App:</strong> Run <code>streamlit run app.py</code> for an interactive web interface with live training</li>
+                        <li><strong>Jupyter Notebook:</strong> Open <code>gan_mnist_notebook.ipynb</code> for detailed analysis and code walkthrough</li>
+                        <li><strong>Python Script:</strong> Run <code>python gan_mnist_notebook.py</code> for command-line training</li>
+                    </ul>
+                </div>
+
+                <h3>🎯 Key Features</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; margin-top: 15px;">
+                    <div style="background: #f8f9ff; padding: 15px; border-radius: 8px;">
+                        <h4 style="color: #667eea;">Generator Network</h4>
+                        <p>3-layer fully-connected network with LeakyReLU activation and BatchNormalization</p>
+                    </div>
+                    <div style="background: #f8f9ff; padding: 15px; border-radius: 8px;">
+                        <h4 style="color: #667eea;">Discriminator Network</h4>
+                        <p>Binary classifier to distinguish real from fake images</p>
+                    </div>
+                    <div style="background: #f8f9ff; padding: 15px; border-radius: 8px;">
+                        <h4 style="color: #667eea;">MNIST Dataset</h4>
+                        <p>60,000 handwritten digit images for training</p>
+                    </div>
+                    <div style="background: #f8f9ff; padding: 15px; border-radius: 8px;">
+                        <h4 style="color: #667eea;">Adversarial Training</h4>
+                        <p>Alternating optimization of Generator and Discriminator</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div id="generate" class="tab-content">
+            <section>
+                <h2>🎨 Generate Synthetic Images</h2>
+                
+                <div class="warning-box">
+                    <strong>⚠️ Interactive Demo Limitation:</strong> This HTML interface is for demonstration purposes only. To generate actual images, please use the Streamlit app (<code>streamlit run app.py</code>) or Jupyter notebook.
+                </div>
+
+                <div class="control-panel">
+                    <h3>Generation Controls</h3>
+                    <div class="control-group">
+                        <label for="numImages">Number of Images:</label>
+                        <select id="numImages">
+                            <option value="9">3×3 (9 images)</option>
+                            <option value="16">4×4 (16 images)</option>
+                            <option value="25" selected>5×5 (25 images)</option>
+                            <option value="36">6×6 (36 images)</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn-primary" onclick="generateDemoImages()" id="generateBtn">
+                            🎲 Generate Sample Images
+                        </button>
+                        <button class="btn-secondary" onclick="clearImages()">
+                            🗑️ Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div id="imageContainer" class="image-grid"></div>
+            </section>
+        </div>
+
+        <div id="train" class="tab-content">
+            <section>
+                <h2>🏋️ Model Training</h2>
+
+                <div class="warning-box">
+                    <strong>⚠️ Training Requirement:</strong> Model training requires Python backend. Use the Streamlit app for interactive training with real-time metrics and visualization.
+                </div>
+
+                <div class="control-panel">
+                    <h3>Training Configuration</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div class="control-group">
+                            <label for="epochs">Epochs:</label>
+                            <input type="number" id="epochs" value="10" min="1" max="400">
+                        </div>
+                        <div class="control-group">
+                            <label for="batchSize">Batch Size:</label>
+                            <select id="batchSize">
+                                <option value="32">32</option>
+                                <option value="64">64</option>
+                                <option value="128" selected>128</option>
+                                <option value="256">256</option>
+                            </select>
+                        </div>
+                        <div class="control-group">
+                            <label for="learningRate">Learning Rate:</label>
+                            <input type="number" id="learningRate" value="0.0002" step="0.0001" min="0.0001" max="0.01">
+                        </div>
+                        <div class="control-group">
+                            <label for="noiseDim">Noise Dimension:</label>
+                            <input type="number" id="noiseDim" value="100" min="50" max="200">
+                        </div>
+                    </div>
+
+                    <div class="button-group" style="margin-top: 20px;">
+                        <button class="btn-success" onclick="alert('Use Streamlit app for training: streamlit run app.py')" disabled>
+                            🚀 Start Training (Use Streamlit App)
+                        </button>
+                        <button class="btn-secondary" onclick="alert('Use Streamlit app for this feature')" disabled>
+                            ⏸️ Pause Training
+                        </button>
+                    </div>
+                </div>
+
+                <h3>Training Progress</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar">0%</div>
+                </div>
+
+                <div class="log-container" id="logContainer">
+                    <div class="log-entry">[INFO] Ready to train. Use Streamlit app for live training.</div>
+                    <div class="log-entry">[INFO] Command: streamlit run app.py</div>
+                </div>
+            </section>
+        </div>
+
+        <div id="about" class="tab-content">
+            <section>
+                <h2>ℹ️ About This Project</h2>
+
+                <h3>🔬 Algorithm Overview</h3>
+                <div class="info-box">
+                    <h4>Generator Network Architecture</h4>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Input:</strong> 100-dimensional noise vector (Gaussian distribution)</li>
+                        <li><strong>Layer 1:</strong> Dense(256) → LeakyReLU(0.2) → BatchNormalization</li>
+                        <li><strong>Layer 2:</strong> Dense(512) → LeakyReLU(0.2) → BatchNormalization</li>
+                        <li><strong>Layer 3:</strong> Dense(1024) → LeakyReLU(0.2) → BatchNormalization</li>
+                        <li><strong>Output:</strong> Dense(784) → Tanh → Reshape(28×28×1)</li>
+                    </ul>
+                </div>
+
+                <div class="info-box">
+                    <h4>Discriminator Network Architecture</h4>
+                    <ul style="margin-left: 20px;">
+                        <li><strong>Input:</strong> 28×28 grayscale image</li>
+                        <li><strong>Layer 1:</strong> Dense(1024) → LeakyReLU(0.2) → BatchNormalization</li>
+                        <li><strong>Layer 2:</strong> Dense(512) → LeakyReLU(0.2) → BatchNormalization</li>
+                        <li><strong>Layer 3:</strong> Dense(256) → LeakyReLU(0.2) → BatchNormalization</li>
+                        <li><strong>Output:</strong> Dense(1) → Sigmoid (real/fake probability)</li>
+                    </ul>
+                </div>
+
+                <h3>🎓 Training Process</h3>
+                <ol style="margin-left: 20px;">
+                    <li><strong>Load Data:</strong> MNIST dataset (60,000 images), normalized to [-1, 1]</li>
+                    <li><strong>Train Discriminator:</strong> On real images (label=1) and fake images (label=0)</li>
+                    <li><strong>Train Generator:</strong> Through GAN model to maximize Discriminator error</li>
+                    <li><strong>Repeat:</strong> Alternate training for 400+ epochs</li>
+                    <li><strong>Evaluate:</strong> Visual inspection at milestones (epochs 1, 30, 100, 200, 400)</li>
+                </ol>
+
+                <h3>📊 Performance Analysis</h3>
+                <p>After 400 epochs of training:</p>
+                <ul style="margin-left: 20px;">
+                    <li><strong>Early epochs (1-30):</strong> Noisy, unrecognizable outputs</li>
+                    <li><strong>Mid epochs (30-100):</strong> Digit shapes emerge, blurry details</li>
+                    <li><strong>Late epochs (200-400):</strong> Clear, recognizable digits with minor artifacts</li>
+                </ul>
+
+                <h3>📚 References</h3>
+                <ul style="margin-left: 20px;">
+                    <li>Goodfellow, I., et al. (2014). <em>Generative Adversarial Nets.</em> NIPS.</li>
+                    <li>Radford, A., et al. (2015). <em>Unsupervised Representation Learning with Deep Convolutional GANs.</em></li>
+                    <li>TensorFlow Keras Documentation: <a href="https://www.tensorflow.org/guide/keras" target="_blank">tensorflow.org/guide/keras</a></li>
+                </ul>
+
+                <h3>🛠️ Technology Stack</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 10px;">
+                    <div style="background: #f8f9ff; padding: 10px; text-align: center; border-radius: 5px;">
+                        <strong>TensorFlow</strong><br>Deep Learning
+                    </div>
+                    <div style="background: #f8f9ff; padding: 10px; text-align: center; border-radius: 5px;">
+                        <strong>Keras</strong><br>Neural Networks
+                    </div>
+                    <div style="background: #f8f9ff; padding: 10px; text-align: center; border-radius: 5px;">
+                        <strong>Streamlit</strong><br>Web Interface
+                    </div>
+                    <div style="background: #f8f9ff; padding: 10px; text-align: center; border-radius: 5px;">
+                        <strong>NumPy</strong><br>Numerical Computing
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; color: #666;">
+            <p><strong>GAN-based Fake Image Generator</strong></p>
+            <p style="margin-top: 10px;">For full interactive features, run: <code style="background: #f0f4ff; padding: 5px 10px; border-radius: 3px;">streamlit run app.py</code></p>
+            <p style="margin-top: 10px; font-size: 0.9em;">See README.md for detailed setup and deployment instructions</p>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function generateDemoImages() {
+            const numImages = parseInt(document.getElementById('numImages').value);
+            const container = document.getElementById('imageContainer');
+            container.innerHTML = '';
+            
+            const side = Math.sqrt(numImages);
+            
+            for (let i = 0; i < numImages; i++) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 28;
+                canvas.height = 28;
+                const ctx = canvas.getContext('2d');
+                
+                // Generate random noise pattern (demonstration only)
+                const imageData = ctx.createImageData(28, 28);
+                for (let j = 0; j < imageData.data.length; j += 4) {
+                    const value = Math.random() * 255;
+                    imageData.data[j] = value;
+                    imageData.data[j + 1] = value;
+                    imageData.data[j + 2] = value;
+                    imageData.data[j + 3] = 255;
+                }
+                ctx.putImageData(imageData, 0, 0);
+                
+                container.appendChild(canvas);
+            }
+            
+            // Add info message
+            setTimeout(() => {
+                alert('⚠️ These are random noise patterns for demonstration.\n\nFor actual GAN-generated images, please use:\n• Streamlit app: streamlit run app.py\n• Jupyter notebook: gan_mnist_notebook.ipynb');
+            }, 100);
+        }
+
+        function clearImages() {
+            document.getElementById('imageContainer').innerHTML = '';
+        }
+
+        // Demo metrics update
+        function updateDemoMetrics() {
+            document.getElementById('epochCount').textContent = '0';
+            document.getElementById('genLoss').textContent = '0.000';
+            document.getElementById('discLoss').textContent = '0.000';
+            document.getElementById('modelStatus').textContent = 'Demo Mode';
+        }
+
+        // Initialize
+        updateDemoMetrics();
+    </script>
+</body>
+</html>
